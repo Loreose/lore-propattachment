@@ -24,26 +24,26 @@ jobs:
         run: |
           # fxmanifest.lua içinden mevcut sürümü çek
           CURRENT_VERSION=$(grep -oP "version '\K[0-9]+\.[0-9]+\.[0-9]+" fxmanifest.lua)
-          
+
           if [ -z "$CURRENT_VERSION" ]; then
             echo "fxmanifest.lua içinde versiyon bulunamadı!"
             exit 1
           fi
-          
+
           # 1.0.0'ı ayır ve sondakini 1 artır
           IFS='.' read -ra ADDR <<< "$CURRENT_VERSION"
           MAJOR="${ADDR[0]}"
           MINOR="${ADDR[1]}"
           PATCH="${ADDR[2]}"
-          
+
           PATCH=$((PATCH + 1))
           NEW_VERSION="$MAJOR.$MINOR.$PATCH"
-          
+
           echo "Eski Versiyon: $CURRENT_VERSION | Yeni Versiyon: $NEW_VERSION"
-          
+
           # Dosyaya yeni sürümü yazdır
           sed -i "s/version '$CURRENT_VERSION'/version '$NEW_VERSION'/g" fxmanifest.lua
-          
+
           # Diğer adımların bilmesi için değişkene kaydet
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
@@ -52,7 +52,7 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add fxmanifest.lua
-          
+
           if git diff-index --quiet HEAD --; then
             echo "Değişiklik yok."
           else
@@ -68,7 +68,7 @@ jobs:
         with:
           files: rose-temp.zip
           tag_name: "v${{ env.NEW_VERSION }}"
-          name: "Sürüm v${{ env.NEW_VERSION }}"
-          target_commitish: ${{ github.ref_name }} # En son attığımız güncel commit'e tag ekler
+          name: "v${{ env.NEW_VERSION }}"
+          target_commitish: ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -2,8 +2,8 @@
 -- game 'gta5'
 
 -- author 'Loreose'
--- description 'ROSE Temp'
--- version '1.0.1'
+-- description 'Temp'
+-- version '1.0.0'
 
 -- shared_scripts {
 --     '@ox_lib/init.lua',

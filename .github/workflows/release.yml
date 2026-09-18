@@ -61,12 +61,12 @@ jobs:
           fi
 
       - name: Zip Dosyası Oluştur
-        run: zip -r rose-temp.zip . -x "*.git*"
+        run: zip -r ${{ github.event.repository.name }}.zip . -x "*.git*"
 
       - name: Release Oluştur ve Zip'i Yükle
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
-          files: rose-temp.zip
+          files: ${{ github.event.repository.name }}.zip
           tag_name: "v${{ env.NEW_VERSION }}"
           name: "v${{ env.NEW_VERSION }}"
           target_commitish: ${{ github.ref_name }}

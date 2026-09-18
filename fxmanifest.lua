@@ -3,7 +3,7 @@
 
 -- author 'Loreose'
 -- description 'ROSE Temp'
--- version '1.0.2'
+-- version '1.0.3'
 
 -- shared_scripts {
 --     '@ox_lib/init.lua',

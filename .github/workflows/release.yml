@@ -1,9 +1,10 @@
-name: Automatic Release
+name: Automatic Release & Bump Version
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
+      - master
 
 permissions:
   contents: write
@@ -11,9 +12,53 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Bu adım, botun kendi attığı commit'in (chore: bump version) tekrar bir release oluşturmasını engeller.
+    if: "!startsWith(github.event.head_commit.message, 'chore: bump version')"
     steps:
       - name: Kodları Çek
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Versiyonu Artır (fxmanifest.lua)
+        run: |
+          # fxmanifest.lua içinden mevcut sürümü çek
+          CURRENT_VERSION=$(grep -oP "version '\K[0-9]+\.[0-9]+\.[0-9]+" fxmanifest.lua)
+          
+          if [ -z "$CURRENT_VERSION" ]; then
+            echo "fxmanifest.lua içinde versiyon bulunamadı!"
+            exit 1
+          fi
+          
+          # 1.0.0'ı ayır ve sondakini 1 artır
+          IFS='.' read -ra ADDR <<< "$CURRENT_VERSION"
+          MAJOR="${ADDR[0]}"
+          MINOR="${ADDR[1]}"
+          PATCH="${ADDR[2]}"
+          
+          PATCH=$((PATCH + 1))
+          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          
+          echo "Eski Versiyon: $CURRENT_VERSION | Yeni Versiyon: $NEW_VERSION"
+          
+          # Dosyaya yeni sürümü yazdır
+          sed -i "s/version '$CURRENT_VERSION'/version '$NEW_VERSION'/g" fxmanifest.lua
+          
+          # Diğer adımların bilmesi için değişkene kaydet
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Yeni Sürümü Commit Et ve GitHub'a Yükle
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add fxmanifest.lua
+          
+          if git diff-index --quiet HEAD --; then
+            echo "Değişiklik yok."
+          else
+            git commit -m "chore: bump version to ${{ env.NEW_VERSION }}"
+            git push
+          fi
 
       - name: Zip Dosyası Oluştur
         run: zip -r rose-temp.zip . -x "*.git*"
@@ -22,5 +67,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: rose-temp.zip
+          tag_name: "v${{ env.NEW_VERSION }}"
+          name: "Sürüm v${{ env.NEW_VERSION }}"
+          target_commitish: ${{ github.ref_name }} # En son attığımız güncel commit'e tag ekler
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

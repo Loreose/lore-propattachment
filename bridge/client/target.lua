@@ -139,3 +139,81 @@ Bridge.RemoveZone = function(zoneId)
         exports['qb-target']:RemoveZone(zoneId)
     end
 end
+
+Bridge.SpawnPedWithTarget = function(model, coords, targetOptions, isNetworked)
+    local modelHash = type(model) == 'string' and GetHashKey(model) or model
+    local isNetworked = isNetworked or false
+
+    -- 1. Model Yükleme
+    if not HasModelLoaded(modelHash) then
+        RequestModel(modelHash)
+        while not HasModelLoaded(modelHash) do
+            Wait(10)
+        end
+    end
+
+    local ped = CreatePed(4, modelHash, coords.x, coords.y, coords.z - 1.0, coords.w or 0.0, isNetworked, false)
+    
+    SetEntityHeading(ped, coords.w or 0.0)
+    FreezeEntityPosition(ped, true)
+    SetEntityInvincible(ped, true)
+    SetBlockingOfNonTemporaryEvents(ped, true)
+    SetModelAsNoLongerNeeded(modelHash)
+
+    -- 3. Otomatik Target Ekleme
+    if targetOptions and #targetOptions > 0 then
+        -- OX TARGET
+        if Bridge.Target == 'ox' then
+            local oxOptions = {}
+            for _, opt in ipairs(targetOptions) do
+                table.insert(oxOptions, {
+                    name = opt.name or opt.label,
+                    icon = opt.icon,
+                    label = opt.label,
+                    onSelect = function(data)
+                        if opt.action then opt.action(data.entity, data.distance, data.coords) end
+                    end,
+                    canInteract = opt.canInteract
+                })
+            end
+
+            exports.ox_target:addLocalEntity(ped, oxOptions)
+
+        elseif Bridge.Target == 'qb' then
+            local qbOptions = {}
+            for _, opt in ipairs(targetOptions) do
+                table.insert(qbOptions, {
+                    icon = opt.icon,
+                    label = opt.label,
+                    action = opt.action,
+                    canInteract = opt.canInteract
+                })
+            end
+
+            exports['qb-target']:AddTargetEntity(ped, {
+                options = qbOptions,
+                distance = 2.0
+            })
+        end
+    end
+
+    return ped
+end
+
+
+--- local ped = Bridge.SpawnPedWithTarget(
+---     'a_m_y_business_01',
+---     vec4(145.2, -1035.4, 29.3, 160.0),
+---     {
+---         {
+---             label = 'Konuş',
+---             icon = 'fas fa-comments',
+---             action = function(entity)
+---                 print("NPC ile konuşuldu:", entity)
+---             end,
+---             canInteract = function(entity)
+---                 return not IsPedDeadOrDying(entity, true)
+---             end
+---         }
+---     }
+--- )

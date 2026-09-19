@@ -8,3 +8,15 @@ Bridge.GetPlayer = function(source)
     end
     return nil
 end
+
+Bridge.GetIdentifier = function(source)
+    local Player = Bridge.GetPlayer(source)
+    if not Player then return nil end
+    
+    if Bridge.Framework == 'qb' then
+        return Player.PlayerData.citizenid
+    elseif Bridge.Framework == 'esx' then
+        return Player.identifier
+    end
+    return nil
+end

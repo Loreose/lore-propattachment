@@ -1,5 +1,6 @@
 Bridge.AddTargetEntity = function(entity, options, distance)
     local distance = distance or 2.0
+
     if Bridge.Target == 'ox' then
         local oxOptions = {}
         for _, opt in ipairs(options) do
@@ -7,6 +8,7 @@ Bridge.AddTargetEntity = function(entity, options, distance)
                 name = opt.name or opt.label,
                 icon = opt.icon,
                 label = opt.label,
+                distance = distance,
                 onSelect = function(data)
                     if opt.action then opt.action(data.entity) end
                 end,
@@ -14,6 +16,7 @@ Bridge.AddTargetEntity = function(entity, options, distance)
             })
         end
         exports.ox_target:addLocalEntity(entity, oxOptions)
+
     elseif Bridge.Target == 'qb' then
         local qbOptions = {}
         for _, opt in ipairs(options) do
@@ -47,9 +50,10 @@ end
 ---     }
 --- }, 2.5)
 
-Bridge.AddCircleZone = function(name, center, radius, options, targetOptions)
+Bridge.AddCircleZone = function(name, center, radius, options, targetOptions, distance)
     local radius = radius or 1.0
     local options = options or {}
+    local distance = distance or 2.0
 
     -- --- OX TARGET ---
     if Bridge.Target == 'ox' then
@@ -59,6 +63,7 @@ Bridge.AddCircleZone = function(name, center, radius, options, targetOptions)
                 name = opt.name or opt.label,
                 icon = opt.icon,
                 label = opt.label,
+                distance = distance,
                 onSelect = function(data)
                     if opt.action then opt.action(data.entity, data.distance, data.coords) end
                 end,
@@ -71,11 +76,11 @@ Bridge.AddCircleZone = function(name, center, radius, options, targetOptions)
             coords = center,
             radius = radius,
             debug = options.debug or false,
-            drawSprite = options.drawSprite or false, -- ox_target built-in sprite
+            drawSprite = options.drawSprite or false,
             options = oxOptions
         })
 
-        -- --- QB TARGET ---
+    -- --- QB TARGET ---
     elseif Bridge.Target == 'qb' then
         local qbOptions = {}
         for _, opt in ipairs(targetOptions) do
@@ -95,11 +100,11 @@ Bridge.AddCircleZone = function(name, center, radius, options, targetOptions)
                 name = name,
                 debugPoly = options.debug or false,
                 useZ = options.useZ == nil and true or options.useZ,
-                drawSprite = options.drawSprite or false -- qb-target PolyZone built-in sprite
+                drawSprite = options.drawSprite or false
             },
             {
                 options = qbOptions,
-                distance = options.distance or 2.0
+                distance = distance
             }
         )
 
@@ -115,7 +120,6 @@ end
 --     1.5,
 --     {
 --         debug = false,
---         distance = 2.5,
 --         drawSprite = true
 --     },
 --     {
@@ -127,7 +131,8 @@ end
 --                 print("Market açıldı.")
 --             end
 --         }
---     }
+--     },
+--   2.0
 -- )
 
 Bridge.RemoveZone = function(zoneId)
@@ -140,11 +145,10 @@ Bridge.RemoveZone = function(zoneId)
     end
 end
 
-Bridge.SpawnPedWithTarget = function(model, coords, targetOptions, isNetworked)
+Bridge.SpawnPedWithTarget = function(model, coords, targetOptions, distance, isNetworked)
     local modelHash = type(model) == 'string' and GetHashKey(model) or model
     local isNetworked = isNetworked or false
-
-    -- 1. Model Yükleme
+    local distance = distance or 2.0
     if not HasModelLoaded(modelHash) then
         RequestModel(modelHash)
         while not HasModelLoaded(modelHash) do
@@ -152,15 +156,16 @@ Bridge.SpawnPedWithTarget = function(model, coords, targetOptions, isNetworked)
         end
     end
 
+    -- 2. Ped Oluşturma
     local ped = CreatePed(4, modelHash, coords.x, coords.y, coords.z - 1.0, coords.w or 0.0, isNetworked, false)
-    
+
     SetEntityHeading(ped, coords.w or 0.0)
     FreezeEntityPosition(ped, true)
     SetEntityInvincible(ped, true)
     SetBlockingOfNonTemporaryEvents(ped, true)
     SetModelAsNoLongerNeeded(modelHash)
 
-    -- 3. Otomatik Target Ekleme
+    -- 3. Target Ekleme
     if targetOptions and #targetOptions > 0 then
         -- OX TARGET
         if Bridge.Target == 'ox' then
@@ -170,6 +175,7 @@ Bridge.SpawnPedWithTarget = function(model, coords, targetOptions, isNetworked)
                     name = opt.name or opt.label,
                     icon = opt.icon,
                     label = opt.label,
+                    distance = distance,
                     onSelect = function(data)
                         if opt.action then opt.action(data.entity, data.distance, data.coords) end
                     end,
@@ -179,6 +185,7 @@ Bridge.SpawnPedWithTarget = function(model, coords, targetOptions, isNetworked)
 
             exports.ox_target:addLocalEntity(ped, oxOptions)
 
+        -- QB TARGET
         elseif Bridge.Target == 'qb' then
             local qbOptions = {}
             for _, opt in ipairs(targetOptions) do
@@ -192,7 +199,7 @@ Bridge.SpawnPedWithTarget = function(model, coords, targetOptions, isNetworked)
 
             exports['qb-target']:AddTargetEntity(ped, {
                 options = qbOptions,
-                distance = 2.0
+                distance = distance
             })
         end
     end
@@ -215,5 +222,6 @@ end
 ---                 return not IsPedDeadOrDying(entity, true)
 ---             end
 ---         }
----     }
+---     },
+---     2.0
 --- )

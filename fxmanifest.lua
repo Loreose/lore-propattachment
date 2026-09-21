@@ -1,26 +1,26 @@
--- fx_version 'cerulean'
--- game 'gta5'
+fx_version 'cerulean'
+game 'gta5'
 
--- author 'Loreose'
--- description 'Temp'
--- version '1.0.4'
+author 'Loreose'
+description 'lore-propattachment'
+version '1.0.0'
 
--- shared_scripts {
---     '@ox_lib/init.lua',
---     'bridge/shared/*.lua',
---     'config.lua',
--- }
+shared_scripts {
+    '@ox_lib/init.lua',
+    'bridge/shared/*.lua',
+    'config.lua',
+}
 
--- client_scripts {
---     'bridge/client/*.lua',
---     'client/*.lua',
--- }
+client_scripts {
+    'bridge/client/*.lua',
+    'client/*.lua',
+}
 
--- server_scripts {
---     '@oxmysql/lib/MySQL.lua',
---     'bridge/server/*.lua',
---     'server/*.lua',
--- }
+server_scripts {
+    '@oxmysql/lib/MySQL.lua',
+    'bridge/server/*.lua',
+    'server/*.lua',
+}
 
--- lua54 'yes'
--- use_fxv2_oal 'yes'
+lua54 'yes'
+use_fxv2_oal 'yes'

@@ -50,6 +50,71 @@ end
 ---     }
 --- }, 2.5)
 
+Bridge.AddTargetBone = function(bones, options, distance)
+    local distance = distance or 2.0
+    if type(bones) ~= "table" then bones = { bones } end
+
+    if Bridge.Target == 'ox' then
+        local oxOptions = {}
+        for _, opt in ipairs(options) do
+            table.insert(oxOptions, {
+                name = opt.name or opt.label,
+                icon = opt.icon,
+                label = opt.label,
+                distance = distance,
+                bones = bones,
+                onSelect = function(data)
+                    if opt.action then opt.action(data.entity) end
+                end,
+                canInteract = opt.canInteract
+            })
+        end
+        exports.ox_target:addGlobalVehicle(oxOptions)
+    elseif Bridge.Target == 'qb' then
+        local qbOptions = {}
+        for _, opt in ipairs(options) do
+            table.insert(qbOptions, {
+                icon = opt.icon,
+                label = opt.label,
+                action = opt.action,
+                canInteract = opt.canInteract
+            })
+        end
+        exports['qb-target']:AddTargetBone(bones, {
+            options = qbOptions,
+            distance = distance
+        })
+    end
+end
+
+--- Bridge.AddTargetBone('boot', {
+---     {
+---         name = 'open_trunk',
+---         label = 'Bagajı Aç',
+---         icon = 'fas fa-box-open',
+---         action = function(entity)
+---             SetVehicleDoorOpen(entity, 5, false, false)
+---         end,
+---         canInteract = function(entity)
+---             return DoesEntityExist(entity) and GetVehicleDoorAngleRatio(entity, 5) == 0.0
+---         end
+---     }
+--- }, 2.5)
+---
+--- Bridge.AddTargetBone({ 'bonnet', 'engine' }, {
+---     {
+---         name = 'inspect_engine',
+---         label = 'Motoru İncele',
+---         icon = 'fas fa-wrench',
+---         action = function(entity)
+---             print("Motor inceleniyor. Araç ID:", entity)
+---         end,
+---         canInteract = function(entity)
+---             return DoesEntityExist(entity) and not IsEntityDead(entity)
+---         end
+---     }
+--- }, 2.0)
+
 Bridge.AddCircleZone = function(name, center, radius, options, targetOptions, distance)
     local radius = radius or 1.0
     local options = options or {}

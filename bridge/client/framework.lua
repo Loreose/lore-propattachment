@@ -14,6 +14,6 @@ Bridge.Notify = function(msg, type, time)
     local time = time or 5000
 
     if GetResourceState('ox_lib') == 'started' then
-        lib.notify({ description = msg, type = type, duration = time })
+        lib.notify({ title = msg, type = type, duration = time })
     end
 end

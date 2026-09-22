@@ -41,7 +41,7 @@ Bridge.PlayAnim = function(dict, anim, duration, flag, propModel, bone, pos, rot
             ped,
             dict,
             anim,
-            8.0, -8.0,
+            3.0, -2.0,
             duration or -1,
             flag or 49,
             0,

@@ -144,8 +144,7 @@ Bridge.AddCircleZone = function(name, center, radius, options, targetOptions, di
             drawSprite = options.drawSprite or false,
             options = oxOptions
         })
-
-    -- --- QB TARGET ---
+        
     elseif Bridge.Target == 'qb' then
         local qbOptions = {}
         for _, opt in ipairs(targetOptions) do

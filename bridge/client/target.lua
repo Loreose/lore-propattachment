@@ -34,22 +34,6 @@ Bridge.AddTargetEntity = function(entity, options, distance)
     end
 end
 
---- local veh = GetVehiclePedIsIn(PlayerPedId(), false)
----
---- Bridge.AddTargetEntity(veh, {
----     {
----         name = 'vehicle_inspect',
----         label = 'Aracı İncele',
----         icon = 'fas fa-magnifying-glass',
----         action = function(entity)
----             print("İncelenen Araç Entity ID:", entity)
----         end,
----         canInteract = function(entity)
----             return DoesEntityExist(entity) and not IsEntityDead(entity)
----         end
----     }
---- }, 2.5)
-
 Bridge.AddTargetBone = function(bones, options, distance)
     local distance = distance or 2.0
     if type(bones) ~= "table" then bones = { bones } end
@@ -87,40 +71,11 @@ Bridge.AddTargetBone = function(bones, options, distance)
     end
 end
 
---- Bridge.AddTargetBone('boot', {
----     {
----         name = 'open_trunk',
----         label = 'Bagajı Aç',
----         icon = 'fas fa-box-open',
----         action = function(entity)
----             SetVehicleDoorOpen(entity, 5, false, false)
----         end,
----         canInteract = function(entity)
----             return DoesEntityExist(entity) and GetVehicleDoorAngleRatio(entity, 5) == 0.0
----         end
----     }
---- }, 2.5)
----
---- Bridge.AddTargetBone({ 'bonnet', 'engine' }, {
----     {
----         name = 'inspect_engine',
----         label = 'Motoru İncele',
----         icon = 'fas fa-wrench',
----         action = function(entity)
----             print("Motor inceleniyor. Araç ID:", entity)
----         end,
----         canInteract = function(entity)
----             return DoesEntityExist(entity) and not IsEntityDead(entity)
----         end
----     }
---- }, 2.0)
-
 Bridge.AddCircleZone = function(name, center, radius, options, targetOptions, distance)
     local radius = radius or 1.0
     local options = options or {}
     local distance = distance or 2.0
 
-    -- --- OX TARGET ---
     if Bridge.Target == 'ox' then
         local oxOptions = {}
         for _, opt in ipairs(targetOptions) do
@@ -144,7 +99,7 @@ Bridge.AddCircleZone = function(name, center, radius, options, targetOptions, di
             drawSprite = options.drawSprite or false,
             options = oxOptions
         })
-        
+
     elseif Bridge.Target == 'qb' then
         local qbOptions = {}
         for _, opt in ipairs(targetOptions) do
@@ -176,29 +131,6 @@ Bridge.AddCircleZone = function(name, center, radius, options, targetOptions, di
     end
 end
 
--- local shopCoords = vec3(25.3, -1347.1, 29.5)
-
--- local myZone = Bridge.AddCircleZone(
---     'market_interaction_zone',
---     shopCoords,
---     1.5,
---     {
---         debug = false,
---         drawSprite = true
---     },
---     {
---         {
---             name = 'open_shop_menu',
---             label = 'Market Aç',
---             icon = 'fas fa-shopping-cart',
---             action = function(entity, distance, coords)
---                 print("Market açıldı.")
---             end
---         }
---     },
---   2.0
--- )
-
 Bridge.RemoveZone = function(zoneId)
     if not zoneId then return end
 
@@ -220,7 +152,6 @@ Bridge.SpawnPedWithTarget = function(model, coords, targetOptions, distance, isN
         end
     end
 
-    -- 2. Ped Oluşturma
     local ped = CreatePed(4, modelHash, coords.x, coords.y, coords.z - 1.0, coords.w or 0.0, isNetworked, false)
 
     SetEntityHeading(ped, coords.w or 0.0)
@@ -229,9 +160,7 @@ Bridge.SpawnPedWithTarget = function(model, coords, targetOptions, distance, isN
     SetBlockingOfNonTemporaryEvents(ped, true)
     SetModelAsNoLongerNeeded(modelHash)
 
-    -- 3. Target Ekleme
     if targetOptions and #targetOptions > 0 then
-        -- OX TARGET
         if Bridge.Target == 'ox' then
             local oxOptions = {}
             for _, opt in ipairs(targetOptions) do
@@ -248,8 +177,6 @@ Bridge.SpawnPedWithTarget = function(model, coords, targetOptions, distance, isN
             end
 
             exports.ox_target:addLocalEntity(ped, oxOptions)
-
-        -- QB TARGET
         elseif Bridge.Target == 'qb' then
             local qbOptions = {}
             for _, opt in ipairs(targetOptions) do
@@ -270,22 +197,3 @@ Bridge.SpawnPedWithTarget = function(model, coords, targetOptions, distance, isN
 
     return ped
 end
-
-
---- local ped = Bridge.SpawnPedWithTarget(
----     'a_m_y_business_01',
----     vec4(145.2, -1035.4, 29.3, 160.0),
----     {
----         {
----             label = 'Konuş',
----             icon = 'fas fa-comments',
----             action = function(entity)
----                 print("NPC ile konuşuldu:", entity)
----             end,
----             canInteract = function(entity)
----                 return not IsPedDeadOrDying(entity, true)
----             end
----         }
----     },
----     2.0
---- )

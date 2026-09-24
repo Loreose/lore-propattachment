@@ -19,11 +19,3 @@ Bridge.SendPoliceAlert = function(data)
         })
     end
 end
-
---- Bridge.SendPoliceAlert({
----     code = '10-90',
----     title = 'Banka Soygunu',
----     message = 'Pacific Standard bankasında hareketlilik!',
----     sprite = 110,
----     color = 1
---- })

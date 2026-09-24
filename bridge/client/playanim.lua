@@ -53,17 +53,6 @@ Bridge.PlayAnim = function(dict, anim, duration, flag, propModel, bone, pos, rot
     return propEntity
 end
 
---- local prop = Bridge.PlayAnim(
----     'amb@world_human_drinking@coffee@male@idle_a',
----     'idle_c',
----     -1,
----     49,
----     'p_amb_coffeecup_01',
----     28422,
----     vec3(0.12, 0.008, 0.03),
----     vec3(-80.0, 0.0, 0.0)
---- )
-
 Bridge.StopAnim = function(propEntity)
     local ped = PlayerPedId()
     ClearPedTasks(ped)

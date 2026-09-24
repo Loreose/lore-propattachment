@@ -17,3 +17,7 @@ Bridge.Notify = function(msg, type, time)
         lib.notify({ title = msg, type = type, duration = time })
     end
 end
+
+RegisterNetEvent('lore-bridge:client:notify', function(msg, type, time)
+    Bridge.Notify(msg, type, time)
+end)

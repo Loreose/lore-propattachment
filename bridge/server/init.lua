@@ -20,3 +20,11 @@ Bridge.GetIdentifier = function(source)
     end
     return nil
 end
+
+Bridge.Notify = function(source, msg, type, time)
+    if not source then return end
+    local type = type or 'inform'
+    local time = time or 5000
+
+    TriggerClientEvent('lore-bridge:client:notify', source, msg, type, time)
+end

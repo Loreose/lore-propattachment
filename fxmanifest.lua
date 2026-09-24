@@ -3,7 +3,7 @@ game 'gta5'
 
 author 'Loreose'
 description 'lore-propattachment'
-version '1.0.2'
+version '1.0.3'
 
 shared_scripts {
     '@ox_lib/init.lua',
